@@ -20,6 +20,7 @@ class Function:
         self.input = input
         self.assigned = assigned
         self.body = body
+        self.output = set()
 
 
 class FunctionBuilder:
@@ -46,7 +47,7 @@ class FunctionBuilder:
         input = set()
 
         for node in nodes:
-            if isinstance(node, ast.Assign):
+            if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
                 assigned.update(get_variables_from_node(node))
             elif (
                 isinstance(node, ast.Name)
@@ -61,6 +62,18 @@ class FunctionBuilder:
         nodes = self._get_nodes_from_tree(tree)
         input, assigned = self._extract_variables(nodes)
         return Function("", input, assigned)
+
+
+class FunctionOutputCalculator:
+    @staticmethod
+    def update_function_output(functions: List[Function]):
+        for i, f in enumerate(functions):
+            f.output = set()
+            for assigned in f.assigned:
+                for j, f2 in enumerate(functions[i + 1 :]):
+                    if assigned in f2.input:
+                        f.output.add(assigned)
+                        break
 
 
 class RefactorCellAdapter:
