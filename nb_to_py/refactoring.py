@@ -16,11 +16,12 @@ class DeepVisitor(ast.NodeVisitor):
 
 
 class Function:
-    def __init__(self, body: str, input: set, assigned: set):
+    def __init__(self, body: str, input: set, assigned: set, name: str):
         self.input = input
         self.assigned = assigned
         self.body = body
-        self.output = set()
+        self.name = name
+        self.output = None
 
 
 class FunctionBuilder:
@@ -57,11 +58,11 @@ class FunctionBuilder:
                 input.add(node.id)
         return input, assigned
 
-    def build_function(self, cell: Cell):
+    def build_function(self, cell: Cell, name: str):
         tree = self._get_source_tree(cell.source)
         nodes = self._get_nodes_from_tree(tree)
         input, assigned = self._extract_variables(nodes)
-        return Function("", input, assigned)
+        return Function(cell.source, input, assigned, name)
 
 
 class FunctionOutputCalculator:
@@ -74,6 +75,20 @@ class FunctionOutputCalculator:
                     if assigned in f2.input:
                         f.output.add(assigned)
                         break
+
+
+class FunctionWriter:
+    def _source_generator(self, function: Function):
+        input = ",".join(function.input)
+        output = ",".join(function.output)
+        body = "\t" + function.body.replace("\n", "\n\t")
+        source = f"def {function.name}({input}):\n{body}\n"
+        source += f"\treturn {output}\n" if output else ""
+        source +="\n"
+        return source
+
+    def write(self, function: Function, output_file: TextIO):
+        output_file.write(self._source_generator(function))
 
 
 class RefactorCellAdapter:
