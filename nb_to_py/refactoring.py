@@ -2,28 +2,36 @@ from typing import TextIO, List, Tuple
 import ast
 from nb_to_py.cell import Cell
 import ast
+from typing import Iterator
 
 
-class My_Visitor(ast.NodeVisitor):
-    visited_nodes=[]
+class DeepVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.visited_nodes = []
 
-    def generic_visit(self, node):
+    def visit(self, node):
+        """Visit a node."""
         self.visited_nodes.append(node)
-        ast.NodeVisitor.generic_visit(self, node)
+        super().visit(node)
 
 
 class Function:
-    def __init__(self, body: str, input: Tuple[str], output: Tuple[str]):
+    def __init__(self, body: str, input: set, assigned: set):
         self.input = input
-        self.output = output
+        self.assigned = assigned
         self.body = body
 
 
 class FunctionBuilder:
-    def _get_source_tree(self, source) -> ast.Module:
+    def _get_source_tree(self, source: str) -> ast.Module:
         return ast.parse(source)
 
-    def _extract_variables(self, tree: ast.Module) -> Tuple[set[str], set[str]]:
+    def _get_nodes_from_tree(self, tree: ast.Module) -> list:
+        visitor = DeepVisitor()
+        visitor.visit(tree)
+        return visitor.visited_nodes
+
+    def _extract_variables(self, nodes: list) -> Tuple[set[str], set[str]]:
         def get_variables_from_node(node) -> set[str]:
             variables = set()
             for target in node.targets:
@@ -37,10 +45,7 @@ class FunctionBuilder:
         assigned = set()
         input = set()
 
-        x = My_Visitor()
-        x.visit(tree)
-
-        for node in x.visited_nodes:
+        for node in nodes:
             if isinstance(node, ast.Assign):
                 assigned.update(get_variables_from_node(node))
             elif (
@@ -53,7 +58,8 @@ class FunctionBuilder:
 
     def build_function(self, cell: Cell):
         tree = self._get_source_tree(cell.source)
-        input, assigned = self._extract_variables(tree)
+        nodes = self._get_nodes_from_tree(tree)
+        input, assigned = self._extract_variables(nodes)
         return Function("", input, assigned)
 
 
