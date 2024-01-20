@@ -48,15 +48,15 @@ class Notebook:
         ]
 
     def merge_markdown_cells(self):
-        source = ""
+        source = []
         cells = []
         for cell in self.cells:
             if cell.cell_type == CellType.Markdown:
-                source += f"{cell.source}\n"
+                source.extend(cell.source)
             elif cell.cell_type == CellType.Code:
-                cell.source = f"{source}{cell.source}"
+                cell.source = source + cell.source
                 cells.append(cell)
-                source = ""
+                source = []
         self.cells = cells
 
 

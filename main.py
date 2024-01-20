@@ -1,11 +1,8 @@
 from nb_to_py.converter import NotebookConverter
 from nb_to_py.notebook import NotebookBuilder, FilterMarkdownType
 import ast
-from nb_to_py.refactoring import (
-    FunctionBuilder,
-    FunctionOutputCalculator,
-    FunctionWriter,
-)
+from nb_to_py.refactoring import FunctionBuilder, FunctionOutputCalculator
+from nb_to_py.writer import Writer
 
 
 if __name__ == "__main__":
@@ -19,7 +16,11 @@ if __name__ == "__main__":
         functions.append(builder.build_function(cell, f"foo_{i}"))
 
     FunctionOutputCalculator.update_function_output(functions)
+    writer = Writer("refactored_sample.py")
 
-    open("refactored_sample.py", "w")
     for f in functions:
-        FunctionWriter().write(f, open("refactored_sample.py", "a"))
+        writer.write_lines(f.imported_body)
+    writer.write_str("\n")
+    for f in functions:
+        if not f.only_comments:
+            writer.write_function(f)

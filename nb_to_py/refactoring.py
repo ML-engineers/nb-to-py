@@ -3,6 +3,7 @@ import ast
 from nb_to_py.cell import Cell
 import ast
 from typing import Iterator, Any
+import re
 
 
 class DeepVisitor(ast.NodeVisitor):
@@ -13,32 +14,72 @@ class DeepVisitor(ast.NodeVisitor):
         self.visited_nodes.append(node)
         super().generic_visit(node)
 
-    def generic_visit_append_after(self, node):
+    def _generic_visit_append_after(self, node):
         super().generic_visit(node)
         self.visited_nodes.append(node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
-        self.generic_visit_append_after(node)
+        self._generic_visit_append_after(node)
 
     def visit_Assign(self, node: ast.Assign) -> Any:
-        self.generic_visit_append_after(node)
+        self._generic_visit_append_after(node)
 
     def visit_AugAssign(self, node: ast.AugAssign) -> Any:
-        self.generic_visit_append_after(node)
+        self._generic_visit_append_after(node)
 
 
 class Function:
-    def __init__(self, body: str, input: set, assigned: set, name: str):
+    def __init__(
+        self,
+        body: List[str],
+        input: set,
+        assigned: set,
+        imported: set,
+        imported_body: List[str],
+        name: str,
+        only_comments: bool,
+    ):
+        self.body = body
         self.input = input
         self.assigned = assigned
-        self.body = body
+        self.imported = imported
+        self.imported_body = imported_body
         self.name = name
         self.output = None
+        self.only_comments = only_comments
 
 
 class FunctionBuilder:
-    def _get_source_tree(self, source: str) -> ast.Module:
-        return ast.parse(source)
+    IMPORT_PATTERN = re.compile(
+        r"^\s*import\s+[\w,]+\s*$|^\s*from\s+[\w.]+\s+import\s+[\w,]+\s*$"
+    )
+
+    def _has_body_only_comments(self, body: List[str]):
+        for line in body:
+            if not line.strip().startswith(("#", '"""')):
+                return False
+        return True
+
+    def _get_body(self, source: List[str]) -> Tuple[List[str], List[str]]:
+        body = []
+        imported_body = []
+        for line in source:
+            if re.match(self.IMPORT_PATTERN, line):
+                imported_body.append(line)
+            else:
+                body.append(line)
+        return body, imported_body
+
+    def _get_imported(self, nodes: list) -> set[str]:
+        imported = set()
+        for node in nodes:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                for n in node.names:
+                    imported.add(n.asname or n.name)
+        return imported
+
+    def _get_source_tree(self, source: List[str]) -> ast.Module:
+        return ast.parse("".join(source))
 
     def _get_nodes_from_tree(self, tree: ast.Module) -> list:
         visitor = DeepVisitor()
@@ -74,7 +115,12 @@ class FunctionBuilder:
         tree = self._get_source_tree(cell.source)
         nodes = self._get_nodes_from_tree(tree)
         input, assigned = self._extract_variables(nodes)
-        return Function(cell.source, input, assigned, name)
+        imported = self._get_imported(nodes)
+        body, imported_body = self._get_body(cell.source)
+        only_comments = self._has_body_only_comments(body)
+        return Function(
+            body, input, assigned, imported, imported_body, name, only_comments
+        )
 
 
 class FunctionOutputCalculator:
@@ -87,20 +133,6 @@ class FunctionOutputCalculator:
                     if assigned in f2.input:
                         f.output.add(assigned)
                         break
-
-
-class FunctionWriter:
-    def _source_generator(self, function: Function):
-        input = ", ".join(function.input)
-        output = ", ".join(function.output)
-        body = "\t" + function.body.replace("\n", "\n\t")
-        source = f"def {function.name}({input}):\n{body}\n"
-        source += f"\treturn {output}\n" if output else ""
-        source += "\n"
-        return source
-
-    def write(self, function: Function, output_file: TextIO):
-        output_file.write(self._source_generator(function))
 
 
 class RefactorCellAdapter:
