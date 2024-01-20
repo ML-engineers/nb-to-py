@@ -1,7 +1,7 @@
 from nb_to_py.converter import NotebookConverter
 from nb_to_py.notebook import NotebookBuilder, FilterMarkdownType
 import ast
-from nb_to_py.refactoring import FunctionBuilder, FunctionOutputCalculator
+from nb_to_py.refactoring import FunctionBuilder, FunctionsUtils
 from nb_to_py.writer import Writer
 
 
@@ -15,7 +15,8 @@ if __name__ == "__main__":
     for i, cell in enumerate(notebook.cells):
         functions.append(builder.build_function(cell, f"foo_{i}"))
 
-    FunctionOutputCalculator.update_function_output(functions)
+    FunctionsUtils.update_function_output(functions)
+    FunctionsUtils.filter_input_by_import_statements(functions)
     writer = Writer("refactored_sample.py")
 
     for f in functions:

@@ -123,7 +123,7 @@ class FunctionBuilder:
         )
 
 
-class FunctionOutputCalculator:
+class FunctionsUtils:
     @staticmethod
     def update_function_output(functions: List[Function]):
         for i, f in enumerate(functions):
@@ -133,6 +133,19 @@ class FunctionOutputCalculator:
                     if assigned in f2.input:
                         f.output.add(assigned)
                         break
+
+    @staticmethod
+    def _get_all_imported(functions: List[Function]):
+        imported = set()
+        for f in functions:
+            imported.update(f.imported)
+        return imported
+
+    @staticmethod
+    def filter_input_by_import_statements(functions: List[Function]):
+        imported = FunctionsUtils._get_all_imported(functions)
+        for f in functions:
+            f.input = f.input.difference(imported)
 
 
 class RefactorCellAdapter:
