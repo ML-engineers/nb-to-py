@@ -47,6 +47,18 @@ class Notebook:
             or (cell.cell_type == CellType.Code and cell.is_marked)
         ]
 
+    def merge_markdown_cells(self):
+        source = ""
+        cells = []
+        for cell in self.cells:
+            if cell.cell_type == CellType.Markdown:
+                source += f"{cell.source}\n"
+            elif cell.cell_type == CellType.Code:
+                cell.source = f"{source}{cell.source}"
+                cells.append(cell)
+                source = ""
+        self.cells = cells
+
 
 class NotebookBuilder:
     def _read_json(self, filepath: str) -> dict:

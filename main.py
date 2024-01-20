@@ -11,6 +11,7 @@ from nb_to_py.refactoring import (
 if __name__ == "__main__":
     builder = NotebookBuilder()
     notebook = builder.build_notebook(filepath="tests/unit/sample.ipynb")
+    notebook.merge_markdown_cells()
     # %%
     builder = FunctionBuilder()
     functions = []

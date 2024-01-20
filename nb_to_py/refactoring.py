@@ -91,8 +91,8 @@ class FunctionOutputCalculator:
 
 class FunctionWriter:
     def _source_generator(self, function: Function):
-        input = ",".join(function.input)
-        output = ",".join(function.output)
+        input = ", ".join(function.input)
+        output = ", ".join(function.output)
         body = "\t" + function.body.replace("\n", "\n\t")
         source = f"def {function.name}({input}):\n{body}\n"
         source += f"\treturn {output}\n" if output else ""
