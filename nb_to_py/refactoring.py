@@ -2,17 +2,29 @@ from typing import TextIO, List, Tuple
 import ast
 from nb_to_py.cell import Cell
 import ast
-from typing import Iterator
+from typing import Iterator, Any
 
 
 class DeepVisitor(ast.NodeVisitor):
     def __init__(self):
         self.visited_nodes = []
 
-    def visit(self, node):
-        """Visit a node."""
+    def generic_visit(self, node):
         self.visited_nodes.append(node)
-        super().visit(node)
+        super().generic_visit(node)
+
+    def generic_visit_append_after(self, node):
+        super().generic_visit(node)
+        self.visited_nodes.append(node)
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
+        self.generic_visit_append_after(node)
+
+    def visit_Assign(self, node: ast.Assign) -> Any:
+        self.generic_visit_append_after(node)
+
+    def visit_AugAssign(self, node: ast.AugAssign) -> Any:
+        self.generic_visit_append_after(node)
 
 
 class Function:
@@ -84,7 +96,7 @@ class FunctionWriter:
         body = "\t" + function.body.replace("\n", "\n\t")
         source = f"def {function.name}({input}):\n{body}\n"
         source += f"\treturn {output}\n" if output else ""
-        source +="\n"
+        source += "\n"
         return source
 
     def write(self, function: Function, output_file: TextIO):
