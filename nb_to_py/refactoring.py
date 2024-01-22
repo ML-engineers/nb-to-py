@@ -6,28 +6,6 @@ from typing import Iterator, Any
 import re
 
 
-class DeepVisitor(ast.NodeVisitor):
-    def __init__(self):
-        self.visited_nodes = []
-
-    def generic_visit(self, node):
-        self.visited_nodes.append(node)
-        super().generic_visit(node)
-
-    def _generic_visit_append_after(self, node):
-        super().generic_visit(node)
-        self.visited_nodes.append(node)
-
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> Any:
-        self._generic_visit_append_after(node)
-
-    def visit_Assign(self, node: ast.Assign) -> Any:
-        self._generic_visit_append_after(node)
-
-    def visit_AugAssign(self, node: ast.AugAssign) -> Any:
-        self._generic_visit_append_after(node)
-
-
 class Function:
     def __init__(
         self,
@@ -47,6 +25,20 @@ class Function:
         self.name = name
         self.output = None
         self.only_comments = only_comments
+
+
+class Source:
+    def __init__(self, functions: List[Function]):
+        self.functions = functions
+
+    pass
+
+    def set_input(self):
+        pass
+
+
+class SourceBuilder:
+    pass
 
 
 class FunctionBuilder:

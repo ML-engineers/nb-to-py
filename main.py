@@ -4,8 +4,15 @@ import ast
 from nb_to_py.refactoring import FunctionBuilder, FunctionsUtils
 from nb_to_py.writer import Writer
 
-
 if __name__ == "__main__":
+    builder = NotebookBuilder()
+    notebook = builder.build_notebook(filepath="tests/unit/sample.ipynb")
+    print("EXCLUDE")
+    print(notebook.filtered_cells_by_markdown_exclude_all)
+    print("KEEP LAST")
+    print(notebook.filtered_cells_by_markdown_keep_last)
+
+if __name__ == "__amain__":
     builder = NotebookBuilder()
     notebook = builder.build_notebook(filepath="tests/unit/sample.ipynb")
     notebook.merge_markdown_cells()
@@ -25,3 +32,8 @@ if __name__ == "__main__":
     for f in functions:
         if not f.only_comments:
             writer.write_function(f)
+
+
+
+
+

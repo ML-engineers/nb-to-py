@@ -14,24 +14,36 @@ class Notebook:
         self.filepath = filepath
         self.cells = cells
 
-    def _exclude_all_mardown_cells(self) -> List[Cell]:
-        return [cell for cell in self.cells if cell.cell_type != CellType.Markdown]
+    @staticmethod
+    def _exclude_all_mardown_cells(cells: List[Cell]) -> List[Cell]:
+        return [cell for cell in cells if cell.cell_type != CellType.Markdown]
 
-    def _keep_last_markdown_cell(self) -> List[Cell]:
-        cells = []
+
+    @staticmethod
+    def _keep_last_markdown_cell(cells: List[Cell]) -> List[Cell]:
+        new_cells = []
         previous_cell = None
-        for cell in self.cells:
+        for cell in cells:
             if (
                 previous_cell is not None
                 and previous_cell.cell_type == CellType.Markdown
                 and cell.cell_type == CellType.Code
             ):
-                cells.append(previous_cell)
+                new_cells.append(previous_cell)
             if cell.cell_type != CellType.Markdown:
-                cells.append(cell)
+                new_cells.append(cell)
 
             previous_cell = cell
-        return cells
+        return new_cells
+
+    @property
+    def filtered_cells_by_markdown_keep_last(self):
+        return self._keep_last_markdown_cell(self.cells)
+
+    @property
+    def filtered_cells_by_markdown_exclude_all(self):
+        return self._exclude_all_mardown_cells(self.cells)
+
 
     def filter_markdown_cells(self, filter_markdown_cells_type: FilterMarkdownType):
         if filter_markdown_cells_type == FilterMarkdownType.KeepLast:
