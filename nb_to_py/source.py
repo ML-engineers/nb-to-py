@@ -9,7 +9,9 @@ class Source:
 
 
 class SourceBuilder:
-    def build(self, notebook: Notebook) -> Source:
+    
+    @staticmethod
+    def build(notebook: Notebook) -> Source:
         function_builder = FunctionBuilder()
         cells = notebook.cells
         # TODO: filter

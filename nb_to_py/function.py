@@ -12,7 +12,7 @@ class Function:
         loaded: set,
         assigned: set,
         imported: set,
-        import_lines: List[str],
+        src_with_import: List[str],
         name: str,
         only_comments: bool,
     ):
@@ -20,7 +20,7 @@ class Function:
         self.loaded = loaded
         self.assigned = assigned
         self.imported = imported
-        self.import_lines = import_lines
+        self.src_with_import = src_with_import
         self.name = name
         self.output = None
         self.only_comments = only_comments
@@ -39,7 +39,7 @@ class FunctionBuilder:
         src_with_import = []
         for line in source:
             if re.match(self.IMPORT_PATTERN, line):
-                src_with_import.append(line)
+                src_with_import.append(line.lstrip())
             else:
                 src_no_import.append(line)
         return src_no_import, src_with_import

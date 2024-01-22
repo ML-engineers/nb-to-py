@@ -8,7 +8,7 @@ class Writer:
 
     def _source_generator(self, function: Function, indent_body: int = 1):
         indent_str = "\t" * indent_body
-        input = ", ".join(function.input)
+        input = ", ".join(function.loaded)
         output = ", ".join(function.output)
         body = indent_str + indent_str.join(function.body)
         source = f"def {function.name}({input}):\n{body}"
