@@ -2,7 +2,8 @@ repos:
 -   repo: https://github.com/psf/black
     rev: 23.12.1
     hooks:
-    - id: black
+    -   id: black
+        files: 'nb_to_py/'
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
