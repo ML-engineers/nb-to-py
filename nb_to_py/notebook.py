@@ -18,7 +18,6 @@ class Notebook:
     def _exclude_all_mardown_cells(cells: List[Cell]) -> List[Cell]:
         return [cell for cell in cells if cell.cell_type != CellType.Markdown]
 
-
     @staticmethod
     def _keep_last_markdown_cell(cells: List[Cell]) -> List[Cell]:
         new_cells = []
@@ -43,7 +42,6 @@ class Notebook:
     @property
     def filtered_cells_by_markdown_exclude_all(self):
         return self._exclude_all_mardown_cells(self.cells)
-
 
     def filter_markdown_cells(self, filter_markdown_cells_type: FilterMarkdownType):
         if filter_markdown_cells_type == FilterMarkdownType.KeepLast:

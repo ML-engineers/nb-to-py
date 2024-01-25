@@ -9,11 +9,12 @@ class Source:
 
 
 class SourceBuilder:
-    
     @staticmethod
     def build(notebook: Notebook) -> Source:
         function_builder = FunctionBuilder()
         cells = notebook.cells
         # TODO: filter
-        functions = [function_builder.build(cell, f"foo_{i}") for i, cell in enumerate(cells)]
+        functions = [
+            function_builder.build(cell, f"foo_{i}") for i, cell in enumerate(cells)
+        ]
         return Source(functions)

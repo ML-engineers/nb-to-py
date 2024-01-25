@@ -1,2 +1,4 @@
-nb_to_py/__pycache__/*
 .vscode/*
+refactored_sample.py
+tests/unit/__pycache__/*
+*/__pycache__/*
