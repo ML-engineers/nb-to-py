@@ -22,7 +22,7 @@ class Function:
         self.imported = imported
         self.src_with_import = src_with_import
         self.name = name
-        self.output = None
+        self.outputs = None
         self.only_comments = only_comments
 
 

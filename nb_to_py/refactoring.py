@@ -13,12 +13,31 @@ class FunctionsUtils:
     @staticmethod
     def update_function_output(functions: List[Function]):
         for i, f in enumerate(functions):
-            f.output = set()
+            f.outputs = set()
             for assigned in f.assigned:
                 for j, f2 in enumerate(functions[i + 1 :]):
                     if assigned in f2.loaded:
-                        f.output.add(assigned)
+                        f.outputs.add(assigned)
                         break
+
+    @staticmethod
+    def create_dependency_dict(
+        functions: List[Function],
+    ) -> dict[str, List[tuple[str, str]]]:
+        output_function_dict = {}
+        dependency_dict = {}
+
+        # TODO: I'm assuming code is sequential
+        for f in functions:
+            # TODO: I'm overring if same name
+            output_function_dict.update({out: f.name for out in f.outputs})
+            dependencies = []
+            for input in f.loaded:
+                if input in output_function_dict:
+                    dependencies.append((output_function_dict[input], input))
+
+            dependency_dict[f.name] = dependencies
+        return dependency_dict
 
     @staticmethod
     def _get_all_imported(functions: List[Function]):

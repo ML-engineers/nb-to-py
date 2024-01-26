@@ -9,10 +9,10 @@ class Writer:
     def _source_generator(self, function: Function, indent_body: int = 1):
         indent_str = "\t" * indent_body
         input = ", ".join(function.loaded)
-        output = ", ".join(function.output)
+        outputs = ", ".join(function.outputs)
         body = indent_str + indent_str.join(function.body)
         source = f"def {function.name}({input}):\n{body}"
-        source += f"\n{indent_str}return {output}\n" if output else ""
+        source += f"\n{indent_str}return {outputs}\n" if outputs else ""
         source += "\n"
         return source
 
