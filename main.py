@@ -6,7 +6,7 @@ from nb_to_py.source import SourceBuilder
 
 if __name__ == "__main__":
     builder = NotebookBuilder()
-    notebook = builder.build_notebook(filepath="sample.ipynb")
+    notebook = builder.build(filepath="sample.ipynb")
     notebook.merge_markdown_cells()
     source = SourceBuilder.build(notebook)
     # print("EXCLUDE")
@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # if __name__ == "__main__":
     #     builder = NotebookBuilder()
-    #     notebook = builder.build_notebook(filepath="tests/unit/sample.ipynb")
+    #     notebook = builder.build(filepath="tests/unit/sample.ipynb")
     #     notebook.merge_markdown_cells()
     #     # %%
     #     builder = FunctionBuilder()

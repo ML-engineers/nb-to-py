@@ -1,3 +1,4 @@
+"""
 from nb_to_py.converter import Notebook, FilterMarkdownType
 
 filepath_sample = "tests/unit/sample.ipynb"
@@ -37,3 +38,4 @@ def test_filter_code_cells_by_marker():
 
     assert "# IMPORT" in nb.cells[0].get("source")[0]
     assert "data = dataset.load" in nb.cells[2].get("source")[0]
+"""

@@ -48,7 +48,7 @@ class CellBuilder:
 
         return self._add_newline_if_not_exists(source)
 
-    def build_cell(self, cell_dict: dict):
+    def build(self, cell_dict: dict):
         cell_type = self._build_cell_type(cell_dict.get("cell_type"))
         is_marked = self._build_is_marked(cell_dict.get("source"), cell_type)
         source = self._build_source(cell_dict.get("source"), is_marked, cell_type)

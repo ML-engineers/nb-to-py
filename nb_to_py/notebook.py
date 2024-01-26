@@ -77,9 +77,9 @@ class NotebookBuilder:
         return nb
 
     def _build_cells(self, builder: CellBuilder, nb_cells: List[dict]) -> List[Cell]:
-        return [builder.build_cell(cell) for cell in nb_cells]
+        return [builder.build(cell) for cell in nb_cells]
 
-    def build_notebook(
+    def build(
         self,
         filepath: str,
     ):
