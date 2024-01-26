@@ -6,7 +6,15 @@ from tests import utils
 
 
 builder = FunctionBuilder()
-
+sources =[
+    utils.function_to_lines(foo0),
+    utils.function_to_lines(foo1),
+    utils.function_to_lines(foo2),
+]
+cell_builder = CellBuilder()
+cells = [cell_builder.build({"cell_type": "code", "source": source}) for source in sources]
+functions = [builder.build(cell, f'foo{i}') for i, cell in enumerate(cells)]
+functions1 = functions[::-1].copy()
 
 def test_verify_markdown_cell():
     broken_source = [
@@ -23,15 +31,14 @@ def test_verify_markdown_cell():
 
 
 def test_create_dependency_dict():
-    sources =[
-        utils.function_to_lines(foo0),
-        utils.function_to_lines(foo1),
-        utils.function_to_lines(foo2),
-    ]
-    cell_builder = CellBuilder()
-    cells = [cell_builder.build({"cell_type": "code", "source": source}) for source in sources]
-    functions = [builder.build(cell, f'foo{i}') for i, cell in enumerate(cells)]
     FunctionsUtils.update_function_output(functions)
     FunctionsUtils.filter_input_by_import_statements(functions)
     result = FunctionsUtils.create_dependency_dict(functions)
     assert result == {'foo0': [], 'foo1': [], 'foo2': [('foo0', 'r1'),('foo1', 'r2')]}
+
+    # reverse order -> different result
+    FunctionsUtils.update_function_output(functions1)
+    FunctionsUtils.filter_input_by_import_statements(functions1)
+    result1 = FunctionsUtils.create_dependency_dict(functions1)
+    assert result1 == {'foo0': [], 'foo1': [], 'foo2': []}
+

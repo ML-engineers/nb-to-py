@@ -28,7 +28,6 @@ if __name__ == "__main__":
 
     FunctionsUtils.update_function_output(functions)
     FunctionsUtils.filter_input_by_import_statements(functions)
-    d = FunctionsUtils.create_dependency_dict(functions)
     writer = Writer("refactored_sample.py")
 
     for f in functions:
@@ -37,3 +36,5 @@ if __name__ == "__main__":
     for f in functions:
         if not f.only_comments:
             writer.write_function(f)
+
+    writer.write_function_calls()

@@ -1,11 +1,8 @@
-from typing import TextIO, List, Tuple
+from typing import TextIO, List
 import ast
 from nb_to_py.cell import Cell
 import ast
-from typing import Iterator, Any
-import re
 
-from nb_to_py.visit import DeepNodeVisitor
 from nb_to_py.function import Function
 
 
