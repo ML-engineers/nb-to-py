@@ -43,12 +43,6 @@ class Notebook:
     def filtered_cells_by_markdown_exclude_all(self):
         return self._exclude_all_mardown_cells(self.cells)
 
-    def filter_markdown_cells(self, filter_markdown_cells_type: FilterMarkdownType):
-        if filter_markdown_cells_type == FilterMarkdownType.KeepLast:
-            self.cells = self._keep_last_markdown_cell()
-        elif filter_markdown_cells_type == FilterMarkdownType.ExcludeAll:
-            self.cells = self._exclude_all_mardown_cells()
-
     def filter_code_cells_by_marker(self):
         self.cells = [
             cell
