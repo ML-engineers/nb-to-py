@@ -3,6 +3,7 @@ from nb_to_py.cell import Cell
 import ast
 import re
 from nb_to_py import visit
+from nb_to_py.cell import CellType
 
 
 class Function:
@@ -33,6 +34,14 @@ class FunctionBuilder:
 
     def _has_body_only_comments(self, body: List[str]):
         return all([line.strip().startswith(("#", '"""')) for line in body])
+
+    def _add_comment_markdown_cell(self, source: List[str]) -> List[str]:
+        return [line if line.startswith("#") else f"# {line}" for line in source]
+
+    def _build_source(self, cell: Cell) -> List[str]:
+        if cell.cell_type == CellType.Markdown:
+            return self._add_comment_markdown_cell(cell.source)
+        return cell.source
 
     def _get_body(self, source: List[str]) -> Tuple[List[str], List[str]]:
         src_no_import = []
@@ -78,12 +87,13 @@ class FunctionBuilder:
         return loaded, assigned
 
     def build(self, cell: Cell, name: str):
-        tree = visit.get_source_tree(cell.source)
+        source = self._build_source(cell)
+        tree = visit.get_source_tree(source)
         visitor = visit.DeepNodeVisitor()
         nodes = visit.get_nodes_from_tree(tree, visitor)
         loaded, assigned = self._extract_variables(nodes)
         imported = self._get_imported(nodes)
-        src_no_import, src_with_import = self._get_body(cell.source)
+        src_no_import, src_with_import = self._get_body(source)
         only_comments = self._has_body_only_comments(src_no_import)
         return Function(
             src_no_import,

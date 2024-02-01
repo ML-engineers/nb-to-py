@@ -3,7 +3,8 @@ from nb_to_py.cell import CellBuilder
 from nb_to_py.refactoring import FunctionsUtils
 from tests.models.example_functions import foo0, foo1, foo2
 from tests import utils
-
+from pytest_unordered import unordered
+ 
 
 builder = FunctionBuilder()
 sources =[
@@ -34,7 +35,7 @@ def test_create_dependency_dict():
     FunctionsUtils.update_function_output(functions)
     FunctionsUtils.filter_input_by_import_statements(functions)
     result = FunctionsUtils.create_dependency_dict(functions)
-    assert result == {'foo0': [], 'foo1': [], 'foo2': [('foo0', 'r1'),('foo1', 'r2')]}
+    assert result == {'foo0': [], 'foo1': [], 'foo2': unordered([('foo0', 'r1'),('foo1', 'r2')])}
 
     # reverse order -> different result
     FunctionsUtils.update_function_output(functions1)

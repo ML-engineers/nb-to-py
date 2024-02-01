@@ -26,13 +26,13 @@ class FunctionsUtils:
 
         # TODO: I'm assuming code is sequential
         for f in functions:
-            # TODO: I'm overring if same name
-            output_function_dict.update({out: f.name for out in f.outputs})
             dependencies = []
             for input in f.loaded:
                 if input in output_function_dict:
                     dependencies.append((output_function_dict[input], input))
 
+            # TODO: I'm overring if same name
+            output_function_dict.update({out: f.name for out in f.outputs})
             dependency_dict[f.name] = dependencies
         return dependency_dict
 

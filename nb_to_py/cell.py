@@ -31,20 +31,13 @@ class CellBuilder:
     def _add_newline_if_not_exists(self, source: List[str]):
         return [line if line.endswith("\n") else f"{line}\n" for line in source]
 
-    def _verify_markdown_cell(self, source: List[str]) -> List[str]:
-        return [line if line.startswith("#") else f"# {line}" for line in source]
-
     def _build_source(
-        self, source: List[str], is_marked: bool, cell_type: CellType
-    ) -> List[str]:
+        self, source: List[str], is_marked: bool) -> List[str]:
         if is_marked:
             if len(source) > 1:
                 source = source[1:]
             else:
                 source = [""]
-
-        if cell_type == CellType.Markdown:
-            source = self._verify_markdown_cell(source)
 
         return self._add_newline_if_not_exists(source)
 

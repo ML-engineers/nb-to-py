@@ -1,4 +1,3 @@
-from nb_to_py.converter import NotebookConverter
 from nb_to_py.notebook import NotebookBuilder, FilterMarkdownType
 from nb_to_py.refactoring import FunctionsUtils
 from nb_to_py.writer import Writer
@@ -7,8 +6,8 @@ from nb_to_py.source import SourceBuilder
 if __name__ == "__main__":
     builder = NotebookBuilder()
     notebook = builder.build(filepath="sample.ipynb")
-    notebook.merge_markdown_cells()
-    source = SourceBuilder.build(notebook)
+    #notebook.merge_markdown_cells()
+    source = SourceBuilder().build(notebook, None)
     # print("EXCLUDE")
     # print(notebook.filtered_cells_by_markdown_exclude_all)
     # print("KEEP LAST")
