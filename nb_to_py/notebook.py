@@ -18,7 +18,6 @@ class Notebook:
     def _exclude_all_mardown_cells(cells: List[Cell]) -> List[Cell]:
         return [cell for cell in cells if cell.cell_type != CellType.Markdown]
 
-
     @staticmethod
     def _keep_last_markdown_cell(cells: List[Cell]) -> List[Cell]:
         new_cells = []
@@ -43,13 +42,6 @@ class Notebook:
     @property
     def filtered_cells_by_markdown_exclude_all(self):
         return self._exclude_all_mardown_cells(self.cells)
-
-
-    def filter_markdown_cells(self, filter_markdown_cells_type: FilterMarkdownType):
-        if filter_markdown_cells_type == FilterMarkdownType.KeepLast:
-            self.cells = self._keep_last_markdown_cell()
-        elif filter_markdown_cells_type == FilterMarkdownType.ExcludeAll:
-            self.cells = self._exclude_all_mardown_cells()
 
     def filter_code_cells_by_marker(self):
         self.cells = [
@@ -79,9 +71,9 @@ class NotebookBuilder:
         return nb
 
     def _build_cells(self, builder: CellBuilder, nb_cells: List[dict]) -> List[Cell]:
-        return [builder.build_cell(cell) for cell in nb_cells]
+        return [builder.build(cell) for cell in nb_cells]
 
-    def build_notebook(
+    def build(
         self,
         filepath: str,
     ):

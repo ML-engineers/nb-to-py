@@ -3,6 +3,7 @@ from nb_to_py.cell import Cell
 import ast
 import re
 from nb_to_py import visit
+from nb_to_py.cell import CellType
 
 
 class Function:
@@ -12,7 +13,7 @@ class Function:
         loaded: set,
         assigned: set,
         imported: set,
-        import_lines: List[str],
+        src_with_import: List[str],
         name: str,
         only_comments: bool,
     ):
@@ -20,9 +21,9 @@ class Function:
         self.loaded = loaded
         self.assigned = assigned
         self.imported = imported
-        self.import_lines = import_lines
+        self.src_with_import = src_with_import
         self.name = name
-        self.output = None
+        self.outputs = None
         self.only_comments = only_comments
 
 
@@ -34,12 +35,20 @@ class FunctionBuilder:
     def _has_body_only_comments(self, body: List[str]):
         return all([line.strip().startswith(("#", '"""')) for line in body])
 
+    def _add_comment_markdown_cell(self, source: List[str]) -> List[str]:
+        return [line if line.startswith("#") else f"# {line}" for line in source]
+
+    def _build_source(self, cell: Cell) -> List[str]:
+        if cell.cell_type == CellType.Markdown:
+            return self._add_comment_markdown_cell(cell.source)
+        return cell.source
+
     def _get_body(self, source: List[str]) -> Tuple[List[str], List[str]]:
         src_no_import = []
         src_with_import = []
         for line in source:
             if re.match(self.IMPORT_PATTERN, line):
-                src_with_import.append(line)
+                src_with_import.append(line.lstrip())
             else:
                 src_no_import.append(line)
         return src_no_import, src_with_import
@@ -78,12 +87,13 @@ class FunctionBuilder:
         return loaded, assigned
 
     def build(self, cell: Cell, name: str):
-        tree = visit.get_source_tree(cell.source)
+        source = self._build_source(cell)
+        tree = visit.get_source_tree(source)
         visitor = visit.DeepNodeVisitor()
         nodes = visit.get_nodes_from_tree(tree, visitor)
         loaded, assigned = self._extract_variables(nodes)
         imported = self._get_imported(nodes)
-        src_no_import, src_with_import = self._get_body(cell.source)
+        src_no_import, src_with_import = self._get_body(source)
         only_comments = self._has_body_only_comments(src_no_import)
         return Function(
             src_no_import,
